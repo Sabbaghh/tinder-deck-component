@@ -14,12 +14,6 @@ const Deck = (props) => {
 	const { DATA } = props;
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const position = useRef(new Animated.ValueXY()).current;
-	const rotate = useRef(
-		position.x.interpolate({
-			inputRange: [-width, 0, width],
-			outputRange: ['45deg', '0deg', '-45deg'],
-		}),
-	).current;
 	const panResponder = useRef(
 		PanResponder.create({
 			onStartShouldSetPanResponder: () => true,
@@ -39,7 +33,7 @@ const Deck = (props) => {
 		}),
 	).current;
 
-	// programatically animations
+	// programmatically animations
 	const forceSwipe = (direction) => {
 		const x = direction === 'right' ? width : -width;
 		Animated.timing(position, {
@@ -68,30 +62,20 @@ const Deck = (props) => {
 		position.setValue({ x: 0, y: 0 });
 		setCurrentIndex((prev) => prev + 1);
 	};
-
-	//styles
+	//dynamic styles
 	const getCardStyle = () => {
+		const rotate = useRef(
+			position.x.interpolate({
+				inputRange: [-width, 0, width],
+				outputRange: ['45deg', '0deg', '-45deg'],
+			}),
+		).current;
 		return {
 			...position.getLayout(),
 			transform: [{ rotate }],
-			zIndex: 10,
-			shadowColor: '#000',
-			shadowOffset: {
-				width: 0,
-				height: 1,
-			},
-			shadowOpacity: 0.2,
-			shadowRadius: 1.41,
-			elevation: 2,
+			...styles.cardStyle,
 		};
 	};
-	const getCardsStyles = () => {
-		return {
-			position: 'absolute',
-			width: '100%',
-		};
-	};
-
 	//renders
 	const renderCards = () => {
 		const { renderCard } = props;
@@ -110,7 +94,7 @@ const Deck = (props) => {
 					{renderCard(currentCardData)}
 				</Animated.View>
 				{followingCardData ? (
-					<Animated.View style={getCardsStyles()} key={followingCardData?.id}>
+					<Animated.View style={styles.cardsStyle} key={followingCardData?.id}>
 						{renderCard(followingCardData)}
 					</Animated.View>
 				) : null}
@@ -123,6 +107,7 @@ const Deck = (props) => {
 
 const styles = StyleSheet.create({
 	cardStyle: {
+		zIndex: 1,
 		position: 'absolute',
 		width: '100%',
 		shadowColor: '#000',
@@ -133,6 +118,10 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.2,
 		shadowRadius: 1.41,
 		elevation: 2,
+	},
+	cardsStyle: {
+		position: 'absolute',
+		width: '100%',
 	},
 });
 export default Deck;
